@@ -1,118 +1,106 @@
-import React from 'react';
-import { 
-  Input, 
-  Segment, 
-  Select,
-  Button,
-} from 'semantic-ui-react'
+import React from "react";
+import { Input, Segment, Select, Button } from "semantic-ui-react";
 import { useContext } from "react";
-import { RequestContext } from '../context/stateHolder';
-import axios from 'axios';
-// import { convertKeyValueToObject } from '../../helpers/convertKeyValueToObject';
-import './InputBar.css';
+import { RequestContext } from "../context/stateHolder";
+import axios from "axios";
+import "./InputBar.css";
 
 const inputConfig = [
-    {
-      key : 'get',
-      text: 'GET',
-      value: 'GET'
-    },
-    {
-      key : 'post',
-      text: 'POST',
-      value: 'POST'
-    },
-    {
-      key : 'put',
-      text: 'PUT',
-      value: 'PUT'
-    },
-    {
-      key : 'patch',
-      text: 'PATCH',
-      value: 'PATCH'
-    },
-    {
-      key : 'delete',
-      text: 'DELETE',
-      value: 'DELETE'
-    }
-  ] 
+  {
+    key: "get",
+    text: "GET",
+    value: "GET",
+  },
+  {
+    key: "post",
+    text: "POST",
+    value: "POST",
+  },
+  {
+    key: "put",
+    text: "PUT",
+    value: "PUT",
+  },
+  {
+    key: "patch",
+    text: "PATCH",
+    value: "PATCH",
+  },
+  {
+    key: "delete",
+    text: "DELETE",
+    value: "DELETE",
+  },
+];
 
-const size = 'large';
-const color = 'black';
-//{ url, setUrl, httpMethod, setHttpMethod, onInputSend }
+const size = "large";
+const color = "black";
+
 const InputBar = () => {
-const states=useContext(RequestContext);
-const handleOnInputSend = async (e) => {
-  states.setLoading(true);
-  
-  e.preventDefault();
-  const requestBody = states.doc.toString();
+  const states = useContext(RequestContext);
+  const handleOnInputSend = async (e) => {
+    states.setLoading(true);
 
-  let data;
-  try {
-    data = JSON.parse(requestBody);
-  } catch (e) {
-    alert('Something is wrong with the JSON data.')
-  }
+    e.preventDefault();
+    const requestBody = states.doc.toString();
 
-  try {
+    let data;
+    try {
+      data = JSON.parse(requestBody);
+    } catch (e) {
+      alert("Something is wrong with the JSON data.");
+    }
 
-    const response = await axios({
-      url: states.url,
-      method: states.httpMethod,
-      params: states.convertKeyValueToObject(states.queryParams),
-      headers: states.convertKeyValueToObject(states.headers),
-      data
-    })
+    try {
+      const response = await axios({
+        url: states.url,
+        method: states.httpMethod,
+        params: states.convertKeyValueToObject(states.queryParams),
+        headers: states.convertKeyValueToObject(states.headers),
+        data,
+      });
 
-    states.setResponse(response);
+      states.setResponse(response);
+    } catch (e) {
+      console.log(e);
+      states.setResponse(e);
+    }
 
-  } catch(e){
-
-    console.log(e);
-    states.setResponse(e);
-  }
-
-
-  states.setLoading(false);
-
-}
-// }
+    states.setLoading(false);
+  };
+  // }
   return (
     <div className="input-bar">
-      <Segment color='black'>
+      <Segment color="black">
         <form>
-          <Input
-            fluid
-            size={size}
-            placeholder='https://example.com'>
+          <Input fluid size={size} placeholder="https://example.com">
             <div className="selection">
               <Select
                 compact
                 defaultValue={states.httpMethod}
                 options={inputConfig}
-                onChange={(_e, data)=> states.setHttpMethod(data.value)} />
+                onChange={(_e, data) => states.setHttpMethod(data.value)}
+              />
             </div>
-            <input 
-                value={states.url} 
-                onChange={(e) => states.setUrl(e.target.value)}
-              />   
+            <input
+              value={states.url}
+              onChange={(e) => states.setUrl(e.target.value)}
+            />
             <div className="button">
               <Button
                 basic
                 color={color}
-                size={size} 
-                onClick={(e)=> handleOnInputSend(e)}>
-                  Send
+                size={size}
+                onClick={(e) => handleOnInputSend(e)}
+              >
+                Send
               </Button>
             </div>
           </Input>
         </form>
       </Segment>
     </div>
-  )
+  );
 };
 
 export default InputBar;
